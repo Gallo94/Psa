@@ -1,16 +1,20 @@
-.open
+.navbar
 {
-    background-color:#2692F5 !important;
+    background-color: #384960 !important;
+}
+.opened
+{
+    background-color:#127bdd !important;
 }
 
 .open.as
 {
-    background-color:#2692F5 !important;
+    background-color:#FFFFFF !important;
 }
 
 .open.mo
 {
-    background-color:#33A5F3 !important;
+    background-color:#95EFF3 !important;
 }
 
 .open.az
@@ -20,16 +24,10 @@
 
 .open.ta
 {
-    background-color:#95EFF3 !important;
+    background-color:#33A5F3 !important;
 }
 
-.open.ta
+.open.in
 {
-    background-color:#DCF5F4 !important;
-}
-
-
-.navbar
-{
-    background-color: #53687B !important;
+    background-color:#2692F5 !important;
 }

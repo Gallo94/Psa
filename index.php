@@ -1,66 +1,62 @@
 <?php
 require 'query.php';
 
-define("CODALF", 0);
-define("DESCR", 1);
-define("TYPE", 2);
-define("CHILDREN", 3);
-
 $result = $client->run($query);
-
-$hash_map = array();
+$nodes = array();
+$dataatt;
+$datafin;
 foreach ($result->records() as $record) {
-    $key = $record->get('cod');
     $value = array();
-    $value[CODALF] = $record->get('codAlf');
-    $value[DESCR] = utf8_decode(addslashes($record->get('descr')));
-    $value[TYPE] = strtolower($record->get('type'));
-    $value[CHILDREN] = $record->get('children');
-    array_multisort($value[CHILDREN], SORT_ASC);
+    $value['cod'] = $record->get('n.cod');
+    $value['codAlf'] = $record->get('n.codAlf');
+    $value['dataAtt'] = date('d/m/Y', strtotime($record->get('n.dataAtt')));
+    $value['dataFin'] = date('d/m/Y', strtotime($record->get('n.dataFin')));
+    $value['descrizione'] = preg_replace('@\x{FFFD}@u', 'à', $record->get('n.descrizione'));
+    $value['nome'] = $record->get('n.nome');
+    $value['nvociSorelle'] = $record->get('n.nvociSorelle');
+    $value['ordine'] = $record->get('n.ordine');
+    $value['percComplAtt'] = $record->get('n.percComplAtt');
+    $value['percComplFin'] = $record->get('n.percComplFin');
+    $value['peso'] = $record->get('n.peso');
+    $value['pesoPercAtt'] = $record->get('n.pesoPercAtt');
+    $value['pesoPercFin'] = $record->get('n.pesoPercFin');
+    $value['tipo'] = $record->get('n.tipo');
 
-    if (!array_key_exists($key, $hash_map))
-        $hash_map[$key] = $value;
+    if ($value['cod'] == null) continue;
+
+    $nodes[] = $value;
 }
 
-function print_tree($key, $hash_map)
-{
-    assert(array_key_exists($key, $hash_map));
-    $data = $hash_map[$key];
-    $children = $data[CHILDREN];
+$cols = "[{\"data\":\"cod\"},{\"data\":\"codAlf\"},{\"data\":\"descrizione\"},{\"data\":\"tipo\"},{\"data\":\"dataAtt\"},{\"data\":\"dataFin\"}]";
+// $cols_as = "[{\"data\":\"tipo\"},{\"data\":\"percComplAtt\"},{\"data\":\"percComplFin\"}]";
+// $cols_mo = "[{\"data\":\"descrizione\"},{\"data\":\"descrizione\"},{\"data\":\"percComplAtt\"},{\"data\":\"percComplFin\"}]";
 
-    foreach ($children as $child) {
-        if ($child == $key)
-            continue;
+// $nodes_as = array();
+// foreach ($nodes as $n) {
+//     if ($n['tipo'] == "AS") {
+//         $nodes_as[] = $n;
+//     }
+// }
 
-        if (count($hash_map[$child][CHILDREN]) == 0) {
-            echo ("<li>\n");
-            echo ("<div class='treeview-animated-element'>" . $hash_map[$child][CODALF] . " - " . utf8_encode($hash_map[$child][DESCR]) . "</div>\n");
-            echo ("</li>\n");
-        } else {
-            echo ("<li class='treeview-animated-items'>\n");
-            echo ("<a class='closed " . $hash_map[$child][TYPE] . "'>\n");
-            echo ("<i class='fas fa-angle-right'></i>\n");
-            echo ("<span>" . $hash_map[$child][CODALF] . " - " . utf8_encode($hash_map[$child][DESCR]) . "</span>");
-            echo ("</a>\n");
-            echo ("<ul class='nested'>\n");
-            print_tree($child, $hash_map);
-            echo ("</ul>\n");
-            echo ("</li>\n");
-        }
-    }
-}
+// $nodes_mo = array();
+// foreach ($nodes as $n) {
+//     if ($n['tipo'] == "MO") {
+//         $nodes_mo[] = $n;
+//         $parent = substr($n['cod'], 0, 1);
+//         foreach ($nodes_as as $as) {
+//             if ($as['cod'] == $parent) { }
+//         }
+//     }
+// }
+
 ?>
 <html>
 
 <head>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
-    <!-- Bootstrap core CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Material Design Bootstrap -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.7/css/mdb.min.css" rel="stylesheet">
-
-    <link href="css/color_type.css" type="text/css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap4.min.css" rel="stylesheet" />
+    <link href="css/color_type.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -68,25 +64,43 @@ function print_tree($key, $hash_map)
     <!--Navbar-->
     <nav class="navbar navbar-dark primary-color">
         <a class="navbar-brand" href="https://www.unicam.it/">
-            <img src="/LogoUnicam.png" height="30" class="d-inline-block align-top">    Piano Strategico
+            <img src="/LogoUnicam.png" height="30" class="d-inline-block align-top"> Piano Strategico
         </a>
     </nav>
-    <div class="treeview-animated border mx-4 my-4">
-        <ul class="treeview-animated-list mb-3">
-            <?php print_tree(0, $hash_map) ?>
-        </ul>
+
+    <div id="main_table_container">
+        <table id="main_table" class="table table-striped table-bordered table-hover" cellspacing="0" width="100%">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Cod</th>
+                    <th scope="col">CodAlf</th>
+                    <th scope="col">Descrizione</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Data Attuale</th>
+                    <th scope="col">Data Fine</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
     </div>
-
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.7/js/mdb.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.treeview-animated').mdbTreeview();
-        });
-    </script>
-
 </body>
 
 </html>
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap4.min.js"></script>
+<script>
+    var json = <?php echo json_encode($nodes) ?>;
+    var cols = <?php echo $cols ?>;
+
+    $(document).ready(function() {
+        $('#main_table').DataTable({
+            "data": json,
+            "columns": cols
+        });
+    });
+</script>
