@@ -1,33 +1,63 @@
-.navbar
+#navbar
 {
-    background-color: #384960 !important;
+    /* background-color: #4c6280 !important; */
+    background: linear-gradient(#4c6280, #5d85aa) !important;
 }
-.opened
+.flex-container
 {
-    background-color:#127bdd !important;
+    display: inline-grid;
+    margin: 10px;
 }
-
-.open.as
+#export #export:hover
 {
-    background-color:#FFFFFF !important;
-}
-
-.open.mo
-{
-    background-color:#95EFF3 !important;
+    color:rgb(#ff3547)         !important;
 }
 
-.open.az
+/* CSS Google DataTable */
+#table_div
 {
-    background-color:#77DCEF !important;
+    display: flex;
+    align-items: center;
+    margin: 10px;
+}
+.google-visualization-table .gradient
+{
+    background-color: white    !important;
+}
+.google-visualization-table-th
+{
+    font-weight: bold            !important;
+    border-top-style: solid      !important;
+    border-bottom-style: solid   !important;
+    border-right-style: none     !important;
+    border-left-style: none      !important;
+}
+.google-visualization-table-td
+{
+    height: 52px                  !important;
+    padding-left: 16px            !important;
+    padding-right: 16px           !important;
+    padding-top: 8px              !important;
+    padding-bottom: 8px           !important;
+    border-top-style: solid       !important;
+    border-bottom-style: solid    !important;
+    border-right-style: none      !important;
+    border-left-style: none       !important;
+}
+.google-visualization-table-tr-head
+{
+    height: 56px                  !important;
+}
+.google-visualization-table-tr-over
+{
+    background-color: #f5f7ff   !important;
+}
+.google-visualization-table-tr-odd
+{
+    height: 52px                  !important;
 }
 
-.open.ta
+.google-visualization-table-tr-sel
 {
-    background-color:#33A5F3 !important;
-}
-
-.open.in
-{
-    background-color:#2692F5 !important;
+    background-color: #fffbf4   !important;
 }
