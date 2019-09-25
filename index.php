@@ -31,24 +31,9 @@ switch ($dlevel) {
             $node[] = array('v' => $record->get('d.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('d.nome')),
                             'f' => $record->get('d.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('d.nome')));
             $node[] = array('v' => $record->get('e.cod')   .' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
-                            'f' => $record->get('e.codAlf')   .' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome'))
-                            //     '<a 
-                            //         id="XX' . $record->get('e.cod') . 'XX" 
-                            //             href="psa_manageVociIndicatore.php?cod=' . 
-                            //                     $record->get('e.cod') . '">
-                            //         dett.
-                            //     </a>'
-                            // );
+                            'f' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')).
+                            '<a id="XX'.$record->get('e.cod').'XX"href="psa_manageVociIndicatore.php?cod='.$record->get('e.cod').'"> link</a>');
                             
-                        //     <a 
-                        //     id="XX' . $record->get('e.cod') . 'XX" 
-                        //         href="psa_manageVociIndicatore.php?cod=' . 
-                        //                 $record->get('e.cod') . '">
-                        //     dett.
-                        // </a>
-                    );
-
-
             $rows[] = array('c' => $node);
         }
 
@@ -155,8 +140,6 @@ $json_table = json_encode($table);
         <link rel="stylesheet" href="css/color_type.css"/>
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"/>
-        <!-- CDN Bootstrap 4.0 css -->
-        <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
         <!-- CDN Bootstrap core css -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
         <!-- CDN MDB css -->
@@ -188,7 +171,8 @@ $json_table = json_encode($table);
                     width: '100%',
                     height: 'auto',
                     showRowNumber: false,
-                    alternatingRowStyle: true
+                    alternatingRowStyle: true,
+                    allowHtml: true
                 });
 
                 // Expand/Collapse level in datatable

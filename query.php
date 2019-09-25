@@ -1,14 +1,13 @@
 <?php
-// require 'db_connection.php';
 
-// AS
+// Area Strategica
 $as_query = ('
     MATCH (a:ps_voci)
     WHERE a.tipo="AS"
     RETURN a.nome, a.codAlf
     ');
 	
-// MO
+// Macro Obiettivo
 $mo_query = ('
     MATCH p=(a:ps_voci {tipo: "AS"})<-[:PS_VOCI]-(b)
     RETURN a.nome, a.codAlf,
@@ -16,7 +15,7 @@ $mo_query = ('
     ORDER BY b.cod
     ');
 
-// AZ
+// Azione
 $az_query = ('
     MATCH p=(a:ps_voci {tipo:"AS"})<-[:PS_VOCI]-
             (b:ps_voci {tipo:"MO"})<-[:PS_VOCI]-(c)
@@ -26,7 +25,7 @@ $az_query = ('
     ORDER BY c.cod
     ');
 
-// TA
+// Target
 $ta_query = ('
     MATCH p=(a:ps_voci {tipo:"AS"})<-[:PS_VOCI]-
             (b:ps_voci {tipo:"MO"})<-[:PS_VOCI]-
@@ -39,19 +38,37 @@ $ta_query = ('
     ');
 
 
-// IN
+// Indicatore
 $in_query = ('
 MATCH p=(a:ps_voci {tipo:"AS"})<-[:PS_VOCI]-
     (b:ps_voci {tipo:"MO"})<-[:PS_VOCI]-
     (c:ps_voci {tipo:"AZ"})<-[:PS_VOCI]-
     (d:ps_voci {tipo:"TA"})<-[:PS_VOCI]-(e)
 RETURN a.nome, a.codAlf,
-       b.nome, b.codAlf,
+b.nome, b.codAlf,
        c.nome, c.codAlf,
        d.nome, d.codAlf,
        e.nome, e.codAlf, e.cod
 ORDER BY e.cod
-    ');
+');
+// Voci Indicatore
+$vi_query =('
+MATCH p=(a:ps_voci {tipo:"AS"})<-[:PS_VOCI]-
+        (b:ps_voci {tipo:"MO"})<-[:PS_VOCI]-
+        (c:ps_voci {tipo:"AZ"})<-[:PS_VOCI]-
+        (d:ps_voci {tipo:"TA"})<-[:PS_VOCI]-
+        (e {cod: 101040101})<-[:PS_STORICO_VOCI]-(f)
+RETURN  
+e.nome as Indicatore,
+e.codAlf as Cod,
+
+f.data as Data,
+f.valoreAtteso as valoreAtteso,
+f.valoreRaggiunto as valoreRaggiunto,
+f.natura as Natura,
+f.nota as Nota
+ORDER BY Data
+')
 
 /*
 MATCH p=(a)-[r:PS_STORICO_VOCI]->(b)

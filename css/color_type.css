@@ -3,6 +3,10 @@
     /* background-color: #4c6280 !important; */
     background: linear-gradient(#4c6280, #5d85aa) !important;
 }
+b, strong
+{
+    font-weight: bold !important;
+}
 .flex-container
 {
     display: inline-grid;
