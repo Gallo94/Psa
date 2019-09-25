@@ -63,8 +63,8 @@ e.nome as Indicatore,
 e.codAlf as Cod,
 
 f.data as Data,
-f.valoreAtteso as valoreAtteso,
-f.valoreRaggiunto as valoreRaggiunto,
+f.valoreAtteso as ValoreAtteso,
+f.valoreRaggiunto as ValoreRaggiunto,
 f.natura as Natura,
 f.nota as Nota
 ORDER BY Data
