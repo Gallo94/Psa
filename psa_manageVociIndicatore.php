@@ -1,63 +1,59 @@
 <?php 
-require_once __DIR__ . '/vendor/autoload.php';
-require_once 'psa_constant.inc.php';
-require_once 'query.php';
+require_once 'db_connection.php';
 
-use GraphAware\Neo4j\Client\ClientBuilder;
+$codindicatore = $_GET["cod"];
 
-$client = ClientBuilder::create()
-    ->addConnection('default', 'http://neo4j:123@172.27.12.44:7474')
-    ->build();
+$query = $vi_query;
 
-	$codindicatore = $_GET["cod"];
+$query = sprintf($query, $codindicatore);
 
-	$query = $vi_query;
-	$result = $client->run($query);
-	$rows = array();
-	foreach ($result->records() as $r)
-	{
-		// crea una riga mettendola nel vettore $temp
-		preg_match('/(\d{4})-(\d{2})-(\d{2})/', $r->get('Data'), $match);
-		$year = (int) $match[1];
-		$month = (int) $match[2]; // convert to zero-index to match javascript's dates
-		$day = (int) $match[3];
-		$temp = array();
+$result = $client->run($query);
+$rows = array();
+foreach ($result->records() as $r)
+{
+	// crea una riga mettendola nel vettore $temp
+	preg_match('/(\d{4})-(\d{2})-(\d{2})/', $r->get('Data'), $match);
+	$year = (int) $match[1];
+	$month = (int) $match[2]; // convert to zero-index to match javascript's dates
+	$day = (int) $match[3];
+	$temp = array();
 
-		$temp[] = array('v' => 'Date(' . date('Y,n,d', strtotime('-1 month', strtotime($r->get('Data')))).')'); 
-		$temp[] = array('v' => (float) $r->get('ValoreAtteso')); 
-		if ($r->get('Nota') == null) {
-			$temp[] = null;
-			$temp[] = null;
-		} else {
-			$temp[] = array('v' => (string) $r->get('Natura')); 
-			$temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
-		}
-		$temp[] = array('v' => (float) $r->get('ValoreRaggiunto')); 
-		if ($r->get('NotaRaggiunto') == null) {
-			$temp[] = null;
-			$temp[] = null;
-		} else {
-			$temp[] = array('v' => (string) $r->get('Natura')); 
-			$temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
-		}
-		// aggiunge la riga creata al vettore delle righe 
-		$rows[] = array('c' => $temp);
+	$temp[] = array('v' => 'Date(' . date('Y,n,d', strtotime('-1 month', strtotime($r->get('Data')))).')'); 
+	$temp[] = array('v' => (float) $r->get('ValoreAtteso')); 
+	if ($r->get('Nota') == null) {
+		$temp[] = null;
+		$temp[] = null;
+	} else {
+		$temp[] = array('v' => (string) $r->get('Natura')); 
+		$temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
 	}
+	$temp[] = array('v' => (float) $r->get('ValoreRaggiunto')); 
+	if ($r->get('Nota') == null) {
+		$temp[] = null;
+		$temp[] = null;
+	} else {
+		$temp[] = array('v' => (string) $r->get('Natura')); 
+		$temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
+	}
+	
+	// aggiunge la riga creata al vettore delle righe 
+	$rows[] = array('c' => $temp);
+}
 
-	$table = array();	// ho due elementi : $table['cols'] per l'intestazione della tabella e $table['rows'] per i dati
-	$table['cols'] = array(
-		  // label individua le colonne della tabella la prima è l'etichetta e la seconda il valore (type:xxxx) 
-		  array('label' => 'Data', 'type' => 'date'),						// Data
-		  array('label' => 'Atteso', 'type' => 'number'),					// Valore Atteso 
-		  array('label' => 'TitoloAtteso', 'type' => 'string'),				// Titolo Valore  Atteso
-		  array('label' => 'TestoAtteso', 'type' => 'string'),				// Testo Nota Valore Atteso
-		  array('label' => 'Raggiunto', 'type' => 'number'),				// Valore Aggiunto
-		  array('label' => 'TitoloRaggiunto', 'type' => 'string'),			// Titolo Nota Valore Raggiunto
-		  array('label' => 'TestoRaggiunto', 'type' => 'string'),			// Nota Valore Aggiunto 
-	);
+$table = array();	// ho due elementi : $table['cols'] per l'intestazione della tabella e $table['rows'] per i dati
+$table['cols'] = array(
+		// label individua le colonne della tabella la prima è l'etichetta e la seconda il valore (type:xxxx) 
+		array('label' => 'Data', 'type' => 'date'),						// Data
+		array('label' => 'Atteso', 'type' => 'number'),					// Valore Atteso 
+		array('label' => 'TitoloAtteso', 'type' => 'string'),				// Titolo Valore  Atteso
+		array('label' => 'TestoAtteso', 'type' => 'string'),				// Testo Nota Valore Atteso
+		array('label' => 'Raggiunto', 'type' => 'number'),				// Valore Aggiunto
+		array('label' => 'TitoloRaggiunto', 'type' => 'string'),			// Titolo Nota Valore Raggiunto
+		array('label' => 'TestoRaggiunto', 'type' => 'string'),			// Nota Valore Aggiunto 
+);
 
-	$table['rows'] = $rows;
-	$jsonTableTrend = json_encode($table);
+$table['rows'] = $rows;
+$jsonTableTrend = json_encode($table);
 ?>
 
 <html>
