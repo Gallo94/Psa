@@ -1,6 +1,11 @@
 <?php
 require_once 'db_connection.php';
 
+require_once 'evaluate_perc.php';
+
+$perc = evaluate_perc_in(101060101, "2023-12-31", 0);
+echo $perc;
+
 $dlevel = isset($_SESSION['dashboard_starting_level']) ? $_SESSION['dashboard_starting_level'] : 'AS';
 
 switch ($dlevel) {
