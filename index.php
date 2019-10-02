@@ -24,7 +24,7 @@ switch ($dlevel) {
                             'f' => $record->get('d.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('d.nome')));
             $node[] = array('v' => $record->get('e.cod')   .' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
                             'f' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')).
-                            '<a id="XX'.$record->get('e.cod').'XX"href="psa_manageVociIndicatore.php?cod='.$record->get('e.cod').'"> link</a>');
+                            '<a id="XX'.$record->get('e.cod').'XX"href="psa_manageVociIndicatore.php?cod='.$record->get('e.cod').'"> info</a>');
                             
             $rows[] = array('c' => $node);
         }
@@ -126,9 +126,11 @@ $json_table = json_encode($table);
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>PIANO STRATEGICO UNICAM</title>
+        <title>UNICAM PIANO STRATEGICO</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Logo Unicam -->
         <link rel="icon" href="/logo.png">
+        <!-- Css -->
         <link rel="stylesheet" href="css/color_type.css"/>
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"/>
@@ -200,14 +202,14 @@ $json_table = json_encode($table);
     <!--Navbar-->
     <nav id="navbar" class="navbar navbar-dark primary-color">
         <a class="navbar-brand" href="https://www.unicam.it/">
-            <img src="/LogoUnicam.png" height="30" class="d-inline-block align-top"> Piano Strategico di Ateneo
+            <img src="/LogoUnicam.png" height="30" class="d-inline-block align-top" style="margin-right: 20px"> Piano Strategico di Ateneo
         </a>
     </nav>
     <!-- Menù -->
     <div class="flex-container">
         <div>
-        <?php if (($dlevel == 'IN') && isset($_GET['e.cod'])) echo '<a href="#'. $_GET['e.cod'].'" >Vai all\'indicatore sezionato </a><br>';?>
-            <b>Livello di visualizzazione</b>
+            <?php if (($dlevel == 'IN') && isset($_GET['e.cod'])) echo '<a href="#'. $_GET['e.cod'].'" >Vai all\'indicatore sezionato </a><br>';?>
+                <b>Livello di visualizzazione</b>
             <select class="form-control input-sm" id="select-expand-all-levels" style="width:180px">
                 <option value="AS" <?php if ($dlevel == 'AS') echo 'selected'; ?>>1 - Area Strategica</option>
                 <option value="MO" <?php if ($dlevel == 'MO') echo 'selected'; ?>>2 - Macro Obiettivo</option>

@@ -1,6 +1,5 @@
 #navbar
 {
-    /* background-color: #4c6280 !important; */
     background: linear-gradient(#4c6280, #5d85aa) !important;
 }
 b, strong
@@ -14,7 +13,7 @@ b, strong
 }
 #export #export:hover
 {
-    color:rgb(#ff3547)         !important;
+    color:rgb(#ff3547) !important;
 }
 
 /* CSS Google DataTable */
@@ -50,18 +49,18 @@ b, strong
 }
 .google-visualization-table-tr-head
 {
-    height: 56px                  !important;
+    height: 56px !important;
 }
 .google-visualization-table-tr-over
 {
-    background-color: #f5f7ff   !important;
+    background-color: #f5f7ff !important;
 }
 .google-visualization-table-tr-odd
 {
-    height: 52px                  !important;
+    height: 52px !important;
 }
 
 .google-visualization-table-tr-sel
 {
-    background-color: #fffbf4   !important;
+    background-color: #fffbf4 !important;
 }

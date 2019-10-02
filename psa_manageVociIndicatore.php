@@ -45,10 +45,10 @@ $table['cols'] = array(
 		// label individua le colonne della tabella la prima è l'etichetta e la seconda il valore (type:xxxx) 
 		array('label' => 'Data', 'type' => 'date'),						// Data
 		array('label' => 'Atteso', 'type' => 'number'),					// Valore Atteso 
-		array('label' => 'TitoloAtteso', 'type' => 'string'),				// Titolo Valore  Atteso
-		array('label' => 'TestoAtteso', 'type' => 'string'),				// Testo Nota Valore Atteso
+		array('label' => 'TitoloAtteso', 'type' => 'string'),			// Titolo Valore  Atteso
+		array('label' => 'TestoAtteso', 'type' => 'string'),			// Testo Nota Valore Atteso
 		array('label' => 'Raggiunto', 'type' => 'number'),				// Valore Aggiunto
-		array('label' => 'TitoloRaggiunto', 'type' => 'string'),			// Titolo Nota Valore Raggiunto
+		array('label' => 'TitoloRaggiunto', 'type' => 'string'),		// Titolo Nota Valore Raggiunto
 		array('label' => 'TestoRaggiunto', 'type' => 'string'),			// Nota Valore Aggiunto 
 );
 
@@ -58,11 +58,15 @@ $jsonTableTrend = json_encode($table);
 
 <html>
 	<head>
-	    <title>PIANO STRATEGICO UNICAM - GESTIONE INDICATORI</title>
+	    <title>UNICAM GESTIONE INDICATORI</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	    <meta charset="utf-8" />
 	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-	    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- Logo Unicam -->
+		<link rel="icon" href="/logo.png">
+		<!-- CSS -->
+        <link rel="stylesheet" href="css/color_type.css"/>
 
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"/>
@@ -96,6 +100,42 @@ $jsonTableTrend = json_encode($table);
 		</script>
 	</head>
 	<body>
-		<div id='chart_div' style='width: 800px; height: 400px;'></div>		
+		<!--Navbar-->
+		<nav id="navbar" class="navbar navbar-dark primary-color">
+			<a class="navbar-brand" href="index.php">
+				<img src="/LogoUnicam.png" height="30" class="d-inline-block align-top" style="margin-right: 20px"> Gestione Voci Indicatore
+			</a>
+		</nav>
+		<!-- Chart  -->
+		<div class="container-fluid">
+			<div id='chart_div' style='width: 800px; height: 400px; margin-top: 10px'/>
+		</div>
+		<!-- Table -->
+		<table id="listaVociIdentificatore" class="table">
+			<tr>
+				<th>Data</th><th>Valore</th><th>Natura</th><th>Nota</th>
+			</tr>
+			<tr class="active" id="idindicatore">
+				<td width="10%">
+					<input type="input" class="datepick" id="dataVoce" data-date-format="dd/mm/yyyy">	
+				</td>
+				<td width="10%">
+					<input type="number" class="form-control datepicker" id="valoreVoce">
+				</td>
+				<td width="10%">
+					<select class="form-control">
+						<option value="A">Atteso</option>
+						<option value="R">Raggiunto</option>
+					</select>
+				</td>
+				<td width="64%">
+					<input type="input" class="form-control" id="notaVoce">
+				</td>
+				<td width="3%">
+					<button class="btn btn-success" data-toggle="confirmation" id="buttonUpdate"><i class="fas fa-plus"></i></button>
+				</td>
+				<td width="3%"><button class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button></td>
+			</tr>
+		</table>
 	</body>
 </html>
