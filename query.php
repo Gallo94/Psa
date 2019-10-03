@@ -73,7 +73,6 @@ ORDER BY Data
 $valore_rag_query =('
 MATCH (e:ps_voci {cod: 101010101})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura: "A"})
 WITH date(f.data) as dataa, f.data as Data, f.nota as Nota, f.id as ID
-
 MATCH (e:ps_voci {cod: 101010101})<-[:PS_STORICO_VOCI]-(f)
 RETURN
 ID,

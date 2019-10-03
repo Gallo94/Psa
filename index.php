@@ -1,10 +1,7 @@
 <?php
 require_once 'db_connection.php';
-
 require_once 'evaluate_perc.php';
-
-$perc = evaluate_perc_in(101060101, "2023-12-31", 0);
-echo $perc;
+require_once 'ev_values.php';
 
 $dlevel = isset($_SESSION['dashboard_starting_level']) ? $_SESSION['dashboard_starting_level'] : 'AS';
 
@@ -18,6 +15,10 @@ switch ($dlevel) {
         $rows = array();
         foreach ($result->records() as $record)
         {
+            // $perc_att = evaluate_perc_in($client, $record->get('e.cod'), new DateTime("2019-08-28"), 0);
+            // $perc_fin = evaluate_perc_in($client, $record->get('e.cod'), new DateTime("2023-12-31", 1);
+            ev_valori_attesi($client, $record->get('e.cod'), "2019-08-28");
+
             $node = array();
             $node[] = array('v' => $record->get('a.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('a.nome')),
                             'f' => $record->get('a.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('a.nome')));
@@ -30,7 +31,10 @@ switch ($dlevel) {
             $node[] = array('v' => $record->get('e.cod')   .' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
                             'f' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')).
                             '<a id="XX'.$record->get('e.cod').'XX"href="psa_manageVociIndicatore.php?cod='.$record->get('e.cod').'"> info</a>');
-                            
+            // $node[] = array('v' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
+            //                 'f' => "<progress value=" . $perc_att . "></progress>" . $perc_att * 100);
+            // $node[] = array('v' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
+            //                 'f' => "<progress value=" . $perc_fin . "></progress>" . $perc_fin * 100);
             $rows[] = array('c' => $node);
         }
 

@@ -1,25 +1,15 @@
 <?php
 
-function evaluate_perc_in($indicatore, $datastr, $final)
+function evaluate_perc_in($client, $indicatore, $data, $final)
 {
-    // Connessione db
-    require "db_connection.php";
-
-    // // Query data iniziale - data finale
-    // $query_date_piano = "match (n:ps_datagen) return n.psDatini as data_iniziale_piano, n.psDatfin as data_finale_piano";
-    // $result = $client->run($query_date_piano);
-    // $data_iniziale_piano = $result->get("data_iniziale_piano");
-    // $data_finale_piano = $result->get("data_finale_piano");
-    // $data_diff_piano = $result->get("data_diff_piano");
-
     // Query data indicatore
     $query_minmax_in =('
-    MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
-    WITH max(date(f.data)) as DataEndPoint, min(date(f.data)) as DataStartPoint
-    MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
-    RETURN
-    min(f.valoreAtteso) as valoreAttesoIniziale, DataStartPoint,
-    max(f.valoreAtteso) as valoreAttesoFinale, DataEndPoint
+        MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
+        WITH max(date(f.data)) as DataEndPoint, min(date(f.data)) as DataStartPoint
+        MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
+        RETURN
+        min(f.valoreAtteso) as valoreAttesoIniziale, DataStartPoint,
+        max(f.valoreAtteso) as valoreAttesoFinale, DataEndPoint
     ');
     $query_minmax_in = sprintf($query_minmax_in, $indicatore, $indicatore);
 
@@ -32,32 +22,31 @@ function evaluate_perc_in($indicatore, $datastr, $final)
     foreach ($result->records() as $record)
     {
         $valore_atteso_iniziale = $record->get("valoreAttesoIniziale");
-        $data_start_point = $record->get("DataStartPoint");
+        $data_start_point = new DateTime($record->get("DataStartPoint"));
         $valore_atteso_finale = $record->get("valoreAttesoFinale");
-        $data_end_point = $record->get("DataEndPoint");
+        $data_end_point = new DateTime($record->get("DataEndPoint"));
     }
 
     // Imposta valore raggiunto iniziale
     $valore_ragg_iniziale = $valore_atteso_iniziale;
 
     // Controllo date
-    $data = strtotime($datastr);
     if ($data < $data_start_point)
         return 0;
     
     if ($data > $data_end_point)
-    $data = $data_end_point;
+        $data = $data_end_point;
     
     // calcolare Valore Atteso
     $valore_atteso = null;
     $valore_atteso_sup = null;
 
     $query_check_insterted = ('
-    MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
-    WHERE date(f.data) = date("%s")
-    RETURN f.valoreAtteso as valoreAtteso
+        MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
+        WHERE date(f.data) = date("%s")
+        RETURN f.valoreAtteso as valoreAtteso
     ');
-    $query_check_insterted = sprintf($query_check_insterted, $indicatore, $datastr);
+    $query_check_insterted = sprintf($query_check_insterted, $indicatore, $data);
     $result = $client->run($query_check_insterted);
     foreach ($result->records() as $record)
     {
@@ -67,10 +56,10 @@ function evaluate_perc_in($indicatore, $datastr, $final)
 
     // Se arrivo a questo step la data e' compresa tra due valori attesi registrati, pertanto e' necessaria l'interpolazione
     // tra il valore atteso immediatamente precedente e successivo
-    $data_atteso_inf = null;
-    $data_atteso_sup = null;
-    $valore_atteso_inf = null;
-    $valore_atteso_sup = null;
+    $data_atteso_inf = 0;
+    $data_atteso_sup = 0;
+    $valore_atteso_inf = 0;
+    $valore_atteso_sup = 0;
     if ($valore_atteso == null)
     {
         // Trovo la data e il valore atteso precedente alla data di ricerca
@@ -79,11 +68,11 @@ function evaluate_perc_in($indicatore, $datastr, $final)
             WHERE date(f.data) < date("%s")
             RETURN max(date(f.data)) as dataInferiore, max(f.valoreAtteso) as valoreAttesoInferiore
         ');
-        $prec_query = sprintf($prec_query, $indicatore, $datastr);
+        $prec_query = sprintf($prec_query, $indicatore, $data);
         $result = $client->run($prec_query);
         foreach ($result->records() as $record)
         {
-            $data_atteso_inf = $record->get("dataInferiore");
+            $data_atteso_inf = new DateTime($record->get("dataInferiore"));
             $valore_atteso_inf = $record->get("valoreAttesoInferiore");
         }
 
@@ -93,15 +82,17 @@ function evaluate_perc_in($indicatore, $datastr, $final)
             WHERE date(f.data) > date("%s")
             RETURN min(date(f.data)) as dataSuperiore, min(f.valoreAtteso) as valoreAttesoSuperiore
         ');
-        $succ_query = sprintf($succ_query, $indicatore, $datastr);
+        $succ_query = sprintf($succ_query, $indicatore, $data);
         $result = $client->run($succ_query);
         foreach ($result->records() as $record)
         {
             $data_atteso_sup = $record->get("dataSuperiore");
+            if ($data_atteso_sup == null) $data_atteso_sup = 0;
             $valore_atteso_sup = $record->get("valoreAttesoSuperiore");
+            if ($valore_atteso_sup == null) $valore_atteso_sup = 0;
         }
 
-        $valore_atteso = (float)(($data - $data_atteso_inf) / ($data_atteso_sup - $data_atteso_inf)) * ($valore_atteso_sup-$valore_atteso_inf) + $valore_atteso_inf;
+        $valore_atteso = (($data - strtotime($data_atteso_inf)) / ($data_atteso_sup - strtotime($data_atteso_inf))) * ($valore_atteso_sup - $valore_atteso_inf) + $valore_atteso_inf;
     }
 
     // calcolare Valore Raggiunto
@@ -109,11 +100,11 @@ function evaluate_perc_in($indicatore, $datastr, $final)
     // $valore_raggiunto_sup = null;
 
     $query_check_insterted = ('
-    MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"R"})
-    WHERE date(f.data) = date("%s")
-    RETURN f.valoreRaggiunto as valoreRaggiunto
+        MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"R"})
+        WHERE date(f.data) = date("%s")
+        RETURN f.valoreRaggiunto as valoreRaggiunto
     ');
-    $query_check_insterted = sprintf($query_check_insterted, $indicatore, $datastr);
+    $query_check_insterted = sprintf($query_check_insterted, $indicatore, $data);
     $result = $client->run($query_check_insterted);
     foreach ($result->records() as $record)
     {
@@ -133,7 +124,7 @@ function evaluate_perc_in($indicatore, $datastr, $final)
             WHERE date(f.data) < date("%s")
             RETURN max(date(f.data)) as dataInferiore, max(f.valoreRaggiunto) as valoreRaggiuntoInferiore
         ');
-        $prec_query = sprintf($prec_query, $indicatore, $datastr);
+        $prec_query = sprintf($prec_query, $indicatore, $data);
         $result = $client->run($prec_query);
         foreach ($result->records() as $record)
         {
@@ -147,7 +138,7 @@ function evaluate_perc_in($indicatore, $datastr, $final)
             WHERE date(f.data) > date("%s")
             RETURN min(date(f.data)) as dataSuperiore, min(f.valoreRaggiunto) as valoreRaggiuntoSuperiore
         ');
-        $succ_query = sprintf($succ_query, $indicatore, $datastr);
+        $succ_query = sprintf($succ_query, $indicatore, $data);
         $result = $client->run($succ_query);
         foreach ($result->records() as $record)
         {
@@ -165,7 +156,7 @@ function evaluate_perc_in($indicatore, $datastr, $final)
                 WHERE date(f.data) < date("%s") AND f.valoreAtteso = %d
                 RETURN max(date(f.data)) as dataInferiore
             ');
-            $prec_query = sprintf($prec_query, $indicatore, $datastr, $valore_atteso_iniziale);
+            $prec_query = sprintf($prec_query, $indicatore, $data, $valore_atteso_iniziale);
             $result = $client->run($prec_query);
             foreach ($result->records() as $record)
             {
@@ -187,7 +178,7 @@ function evaluate_perc_in($indicatore, $datastr, $final)
         else if ($valore_raggiunto_inf != null && $valore_raggiunto_sup != null)
         {
             $valore_raggiunto = (float)(($data - $data_raggiunto_inf) / ($data_raggiunto_sup - $data_raggiunto_inf)) *
-                                    ($valore_raggiunto_sup - $valore_raggiunto_inf) + $valore_raggiunto_inf;           
+                                    ($valore_raggiunto_sup - $valore_raggiunto_inf) + $valore_raggiunto_inf;
         }               
     }
     // Casi anomali
@@ -200,7 +191,7 @@ function evaluate_perc_in($indicatore, $datastr, $final)
     $perc_compl = 0;
     if ($valore_atteso != $valore_atteso_iniziale)
     {
-        switch(_final)
+        switch($final)
         {
             case 0: // Mi riferisco al valore atteso in data attuale
                 $perc_compl = ($valore_raggiunto - $valore_atteso_iniziale) / ($valore_atteso - $valore_atteso_iniziale);
