@@ -1,6 +1,5 @@
 <?php
 
-
 function ev_valori_attesi($client, $cod, $data)
 {
     // Exec query
@@ -87,6 +86,8 @@ function ev_valori_attesi($client, $cod, $data)
             $valore_atteso =  ($data->diff($data_inferiore)->days / $data_superiore->diff($data_inferiore)->days) * ($valore_atteso_superiore - $valore_atteso_inferiore) + $valore_atteso_inferiore;
         }
     }
+
+    return $valore_atteso;
 }
 
 function ev_valori_raggiunti($client, $cod, $data)
@@ -111,22 +112,23 @@ function ev_valori_raggiunti($client, $cod, $data)
             WHERE date(b.data) = date("%s")
             RETURN b.valoreAtteso as valore_atteso
         ';
-        $query = sprintf($query, $cod);
+        $query = sprintf($query, $cod, $data);
         $result = $client->run($query);
         $record = $result->getRecord();
         return $record->get('valore_atteso');
     }
-/////////////////////////////////////////
+
     $query = '
-    MATCH (n:ps_datagen)
-    MATCH (a:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(b:ps_storico {natura:"R"})
-    RETURN date(min(b.data)) as data_iniziale_indicatore, date(max(b.data)) as data_finale_indicatore,
-    min(b.valoreAtteso) as valoreRaggiuntoIniziale, max(b.valoreAtteso) as valoreRaggiuntoFinale,
+        MATCH (a:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(b:ps_storico {natura:"R"})
+        RETURN date(min(b.data)) as data_iniziale_indicatore, date(max(b.data)) as data_finale_indicatore,
+        max(b.valoreRaggiunto) as valoreRaggiuntoFinale
     ';
+    $query = sprintf($query, $cod);
+    $result = $client->run($query);
+    $record = $result->getRecord();
 
     $data_iniziale_indicatore = $record->get("data_iniziale_indicatore");
     $data_finale_indicatore = $record->get("data_finale_indicatore");
-    $valoreRaggiuntoIniziale = $record->get("valoreRaggiuntoIniziale");
     $valoreRaggiuntoFinale = $record->get("valoreRaggiuntoFinale");
 
     $valore_raggiunto = 0;
@@ -213,8 +215,60 @@ function ev_valori_raggiunti($client, $cod, $data)
             $data1 = new DateTime($data);
             $valore_raggiunto =  ($data1->diff($data_inferiore)->days / $data_superiore->diff($data_inferiore)->days) * ($valore_raggiunto_superiore - $valore_raggiunto_inferiore) + $valore_raggiunto_inferiore;    
         }
-
     }
 
     return $valore_raggiunto;
+}
+
+function ps_sl_voci_indicatore($client, $cod, $curdata)
+{
+    $query =('
+        MATCH p=(e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f)
+        RETURN
+        f.valoreAtteso as ValoreAtteso,
+        f.valoreRaggiunto as ValoreRaggiunto,
+        f.natura as Natura,
+        f.data as Data
+        ORDER BY Data
+        
+    ');
+    $query = sprintf($query, $cod);
+    $result = $client->run($query);
+    
+    foreach ($result->getRecords() as $record)
+    {
+        $valore_atteso = $record->get("ValoreAtteso");
+        $valore_raggiunto = $record->get("ValoreRaggiunto");
+        $natura = $record->get("Natura");
+        $data = $record->get("Data");
+
+        $value = 0;
+        if ($natura == 'A' && $valore_raggiunto == null)
+        {
+            $value = ev_valori_raggiunti($client, $cod, $curdata);
+            $query = '
+                MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
+                WHERE date(f.data) = date("%s")
+                SET f.valoreRaggiunto = %.2f
+                RETURN f.valoreRaggiunto as valoreRaggiunto
+            ';
+
+            $query = sprintf($query, $cod, $data, $value);
+            $result = $client->run($query);
+            $record = $result->getRecord();
+        }
+        else if ($natura == 'R' && $valore_atteso == null)
+        {
+            $value = ev_valori_attesi($client, $cod, $curdata);
+            $query = '
+                MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"R"})
+                WHERE date(f.data) = date("%s")
+                SET f.valoreAtteso = %.2f
+                RETURN f.valoreAtteso as valoreAtteso
+            ';
+            $query = sprintf($query, $cod, $data, (float)$value);
+            $result = $client->run($query);
+            $record = $result->getRecord();
+        }
+    }
 }

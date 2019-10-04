@@ -17,7 +17,12 @@ switch ($dlevel) {
         {
             // $perc_att = evaluate_perc_in($client, $record->get('e.cod'), new DateTime("2019-08-28"), 0);
             // $perc_fin = evaluate_perc_in($client, $record->get('e.cod'), new DateTime("2023-12-31", 1);
-            ev_valori_attesi($client, $record->get('e.cod'), "2019-08-28");
+            
+            // $va = ev_valori_attesi($client, $record->get('e.cod'), "2019-08-28");
+            // $vr = ev_valori_raggiunti($client, $record->get("e.cod"), "2019-08-28");
+            // printf("%d: %.2f<br>", $record->get("e.cod"), $vr);
+
+            ps_sl_voci_indicatore($client, $record->get("e.cod"), "2019-08-28");
 
             $node = array();
             $node[] = array('v' => $record->get('a.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('a.nome')),
