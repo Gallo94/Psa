@@ -22,9 +22,9 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
     foreach ($result->records() as $record)
     {
         $valore_atteso_iniziale = $record->get("valoreAttesoIniziale");
-        $data_start_point = new DateTime($record->get("DataStartPoint"));
+        $data_start_point = $record->get("DataStartPoint");
         $valore_atteso_finale = $record->get("valoreAttesoFinale");
-        $data_end_point = new DateTime($record->get("DataEndPoint"));
+        $data_end_point = $record->get("DataEndPoint");
     }
 
     // Imposta valore raggiunto iniziale
@@ -33,7 +33,6 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
     // Controllo date
     if ($data < $data_start_point)
         return 0;
-    
     if ($data > $data_end_point)
         $data = $data_end_point;
     
@@ -48,10 +47,11 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
     ');
     $query_check_insterted = sprintf($query_check_insterted, $indicatore, $data);
     $result = $client->run($query_check_insterted);
-    foreach ($result->records() as $record)
+    $record =$result->getRecord();
+    if ($record != null)
     {
         $valore_atteso = $record->get("valoreAtteso");
-        $valore_atteso_sup = $record->get("valoreAtteso");
+        $valore_atteso_sup = $valore_atteso;
     }
 
     // Se arrivo a questo step la data e' compresa tra due valori attesi registrati, pertanto e' necessaria l'interpolazione
@@ -86,13 +86,14 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
         $result = $client->run($succ_query);
         foreach ($result->records() as $record)
         {
-            $data_atteso_sup = $record->get("dataSuperiore");
-            if ($data_atteso_sup == null) $data_atteso_sup = 0;
+            $data_atteso_sup = new DateTime($record->get("dataSuperiore"));
+            // if ($data_atteso_sup == null) $data_atteso_sup = 0;
             $valore_atteso_sup = $record->get("valoreAttesoSuperiore");
-            if ($valore_atteso_sup == null) $valore_atteso_sup = 0;
+            // if ($valore_atteso_sup == null) $valore_atteso_sup = 0;
         }
 
-        $valore_atteso = (($data - strtotime($data_atteso_inf)) / ($data_atteso_sup - strtotime($data_atteso_inf))) * ($valore_atteso_sup - $valore_atteso_inf) + $valore_atteso_inf;
+        $data1 = new DateTime($data);
+        $valore_atteso = ($data1->diff($data_atteso_inf)->days / $data_atteso_sup->diff($data_atteso_inf)->days) * ($valore_atteso_sup - $valore_atteso_inf) + $valore_atteso_inf;
     }
 
     // calcolare Valore Raggiunto
@@ -106,12 +107,10 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
     ');
     $query_check_insterted = sprintf($query_check_insterted, $indicatore, $data);
     $result = $client->run($query_check_insterted);
-    foreach ($result->records() as $record)
-    {
+    $record = $result->getRecord();
+    if ($record != null)
         $valore_raggiunto = $record->get("valoreRaggiunto");
-        // $valore_raggiunto_sup = $record->get("valoreRaggiunto");
-    }
-
+        
     $data_raggiunto_inf = null;
     $data_raggiunto_sup = null;
     $valore_raggiunto_inf = null;
@@ -126,9 +125,10 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
         ');
         $prec_query = sprintf($prec_query, $indicatore, $data);
         $result = $client->run($prec_query);
-        foreach ($result->records() as $record)
+        $record = $result->getRecord();
+        if ($record != null)
         {
-            $data_raggiunto_inf = $record->get("dataInferiore");
+            $data_raggiunto_inf = new DateTime($record->get("dataInferiore"));
             $valore_raggiunto_inf = $record->get("valoreRaggiuntoInferiore");
         }
 
@@ -140,9 +140,10 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
         ');
         $succ_query = sprintf($succ_query, $indicatore, $data);
         $result = $client->run($succ_query);
-        foreach ($result->records() as $record)
+        $record = $result->getRecord();
+        if ($record != null)
         {
-            $data_raggiunto_sup = $record->get("dataSuperiore");
+            $data_raggiunto_sup = new DateTime($record->get("dataSuperiore"));
             $valore_raggiunto_sup = $record->get("valoreRaggiuntoSuperiore");
         }
 
@@ -158,13 +159,15 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
             ');
             $prec_query = sprintf($prec_query, $indicatore, $data, $valore_atteso_iniziale);
             $result = $client->run($prec_query);
-            foreach ($result->records() as $record)
+            $record = $result->getRecord();
+            if ($record != null)
             {
-                $data_raggiunto_inf = $record->get("dataInferiore");
+                $data_raggiunto_inf = new DateTime($record->get("dataInferiore"));
                 // $valore_atteso_inf = $record->get("valoreAttesoInferiore");
             }
 
-            $valore_raggiunto = (float)(($data - $data_raggiunto_inf) / ($data_raggiunto_sup - $data_raggiunto_inf)) *
+            $data1 = new DateTime($data);
+            $valore_raggiunto = ($data1->diff($data_raggiunto_inf)->days / ($data_raggiunto_sup->diff($data_raggiunto_inf)->days)) *
                                     ($valore_raggiunto_sup - $valore_ragg_iniziale) + $valore_ragg_iniziale;
         }
         else if ($valore_raggiunto_inf == null && $valore_raggiunto_sup != null && $valore_atteso_sup == $valore_atteso_iniziale)
@@ -177,7 +180,8 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
         }
         else if ($valore_raggiunto_inf != null && $valore_raggiunto_sup != null)
         {
-            $valore_raggiunto = (float)(($data - $data_raggiunto_inf) / ($data_raggiunto_sup - $data_raggiunto_inf)) *
+            $data1 = new DateTime($data);
+            $valore_raggiunto = ($data1->diff($data_raggiunto_inf)->days / ($data_raggiunto_sup->diff($data_raggiunto_inf)->days)) *
                                     ($valore_raggiunto_sup - $valore_raggiunto_inf) + $valore_raggiunto_inf;
         }               
     }
