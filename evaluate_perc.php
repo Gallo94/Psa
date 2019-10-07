@@ -5,11 +5,10 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
     // Query data indicatore
     $query_minmax_in =('
         MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
-        WITH max(date(f.data)) as DataEndPoint, min(date(f.data)) as DataStartPoint
-        MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
+        WITH max(date(f.data)) as DataEndPoint, min(date(f.data)) as DataStartPoint,
+        min(f.valoreAtteso) as valoreAttesoIniziale, max(f.valoreAtteso) as valoreAttesoFinale
         RETURN
-        min(f.valoreAtteso) as valoreAttesoIniziale, DataStartPoint,
-        max(f.valoreAtteso) as valoreAttesoFinale, DataEndPoint
+        valoreAttesoIniziale, DataStartPoint, valoreAttesoFinale, DataEndPoint
     ');
     $query_minmax_in = sprintf($query_minmax_in, $indicatore, $indicatore);
 
@@ -98,7 +97,6 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
 
     // calcolare Valore Raggiunto
     $valore_raggiunto = null;
-    // $valore_raggiunto_sup = null;
 
     $query_check_insterted = ('
         MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"R"})

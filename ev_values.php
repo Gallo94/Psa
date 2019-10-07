@@ -140,8 +140,8 @@ function ev_valori_raggiunti($client, $cod, $data)
         ';
         $query = sprintf($query, $cod);
         $result = $client->run($query);
-        $record = $result->getRecord();       
-        $valore_raggiunto_inferiore = $record->get("valore_raggiunto_inferiore"); // <====
+        $record = $result->getRecord();
+        $valore_raggiunto_inferiore = $record->get("valore_raggiunto_inferiore");
         
         $query = '
             MATCH (a:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(b:ps_storico {natura:"A"})
@@ -151,7 +151,7 @@ function ev_valori_raggiunti($client, $cod, $data)
         $query = sprintf($query, $cod, $valore_raggiunto_inferiore);
         $result = $client->run($query);
         $record = $result->getRecord();
-        $data_inferiore = new DateTime($record->get("data_inferiore"));                          // <====
+        $data_inferiore = new DateTime($record->get("data_inferiore"));
 
         $query = '
             MATCH (a:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(b:ps_storico {natura:"R"})
