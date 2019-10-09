@@ -24,16 +24,16 @@ foreach ($result->records() as $r)
 		$temp[] = null;
 		$temp[] = null;
 	} else {
-		$temp[] = array('v' => (string) $r->get('Natura')); 
-		$temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
+		// $temp[] = array('v' => (string) $r->get('Natura')); 
+		// $temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
 	}
 	$temp[] = array('v' => (float) $r->get('ValoreRaggiunto')); 
 	if ($r->get('Nota') == null) {
 		$temp[] = null;
 		$temp[] = null;
 	} else {
-		$temp[] = array('v' => (string) $r->get('Natura')); 
-		$temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
+		// $temp[] = array('v' => (string) $r->get('Natura')); 
+		// $temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
 	}
 	
 	// aggiunge la riga creata al vettore delle righe 
@@ -45,11 +45,11 @@ $table['cols'] = array(
 		// label individua le colonne della tabella la prima è l'etichetta e la seconda il valore (type:xxxx) 
 		array('label' => 'Data', 'type' => 'date'),						// Data
 		array('label' => 'Atteso', 'type' => 'number'),					// Valore Atteso 
-		array('label' => 'TitoloAtteso', 'type' => 'string'),			// Titolo Valore  Atteso
-		array('label' => 'TestoAtteso', 'type' => 'string'),			// Testo Nota Valore Atteso
+		// array('label' => 'TitoloAtteso', 'type' => 'string'),			// Titolo Valore  Atteso
+		// array('label' => 'TestoAtteso', 'type' => 'string'),			// Testo Nota Valore Atteso
 		array('label' => 'Raggiunto', 'type' => 'number'),				// Valore Aggiunto
-		array('label' => 'TitoloRaggiunto', 'type' => 'string'),		// Titolo Nota Valore Raggiunto
-		array('label' => 'TestoRaggiunto', 'type' => 'string'),			// Nota Valore Aggiunto 
+		// array('label' => 'TitoloRaggiunto', 'type' => 'string'),		// Titolo Nota Valore Raggiunto
+		// array('label' => 'TestoRaggiunto', 'type' => 'string'),			// Nota Valore Aggiunto 
 );
 
 $table['rows'] = $rows;
@@ -113,29 +113,34 @@ $jsonTableTrend = json_encode($table);
 		<!-- Table -->
 		<table id="listaVociIdentificatore" class="table">
 			<tr>
-				<th>Data</th><th>Valore</th><th>Natura</th><th>Nota</th>
+				<th>Data Att.</th><th>Valore Att.</th><th>Data Fin.</th><th>Valore Fin.</th><th>Nota</th>
 			</tr>
-			<tr class="active" id="idindicatore">
-				<td width="10%">
-					<input type="input" class="datepick" id="dataVoce" data-date-format="dd/mm/yyyy">	
-				</td>
-				<td width="10%">
-					<input type="number" class="form-control datepicker" id="valoreVoce">
-				</td>
-				<td width="10%">
-					<select class="form-control">
-						<option value="A">Atteso</option>
-						<option value="R">Raggiunto</option>
-					</select>
-				</td>
-				<td width="64%">
-					<input type="input" class="form-control" id="notaVoce">
-				</td>
-				<td width="3%">
-					<button class="btn btn-success" data-toggle="confirmation" id="buttonUpdate"><i class="fas fa-plus"></i></button>
-				</td>
-				<td width="3%"><button class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button></td>
-			</tr>
+			<?php foreach($result->records() as $r) { ?>
+				<tr class="active" id="idindicatore">
+					<td width="10%">
+						<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
+						value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
+					</td>
+					<td width="10%">
+						<input type="number" class="form-control datepicker" id="valoreVoce"
+						value=<?php echo $r->get('ValoreAtteso') ?>>
+					</td>
+					<td width="10%">
+						<select class="form-control">
+							<option value="A">Atteso</option>
+							<option value="R">Raggiunto</option>
+						</select>
+					</td>
+					<td width="64%">
+						<input type="input" class="form-control" id="notaVoce">
+					</td>
+					<td width="3%">
+						<button class="btn btn-success" data-toggle="confirmation" id="buttonUpdate"><i class="fas fa-check"></i></button>
+					</td>
+					<td width="3%"><button class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button></td>
+				</tr>
+
+			<?php } ?>
 		</table>
 	</body>
 </html>
