@@ -16,12 +16,10 @@ switch ($dlevel) {
         foreach ($result->records() as $record)
         {
             
-            // $va = ev_valori_attesi($client, $record->get('e.cod'), "2019-08-28");
-            // $vr = ev_valori_raggiunti($client, $record->get("e.cod"), "2019-08-28");
-            // printf("%d: %.2f<br>", $record->get("e.cod"), $vr);
-
-            ps_sl_voci_indicatore($client, $record->get("e.cod"), "2019-08-28");
-            
+            // $va = ev_valori_attesi($client, $record->get('e.cod'), "2019-01-01");
+            // $vr = ev_valori_raggiunti($client, $record->get("e.cod"), "2019-01-01");
+            // printf("%d: [%d, %d]<br>", $record->get("e.cod"), $va, $vr);
+            // aggiorna_indicatore($client, $record->get("e.cod"), "2019-01-01"); 
             // $perc_att = evaluate_perc_in($client, $record->get('e.cod'), "2019-08-28", 0);
             // $perc_att = number_format($perc_att, 2, '.', ',');
             // $perc_fin = evaluate_perc_in($client, $record->get('e.cod'), "2023-12-31", 1);
@@ -37,17 +35,17 @@ switch ($dlevel) {
             $node[] = array('v' => $record->get('d.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('d.nome')),
                             'f' => $record->get('d.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('d.nome')));
             $node[] = array('v' => $record->get('e.cod')   .' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
-                            'f' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')));
-            // $node[] = array('v' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
-            //                 'f' => "<progress value=" . $perc_att . "></progress>" . " " . $perc_att * 100);
-            // $node[] = array('v' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
-            //                 'f' => "<progress value=" . $perc_fin . "></progress>" . " " . $perc_fin * 100);
-            $node[] = array('v' => $record->get('e.cod')   .' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
                             'f' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')).
-                            '<a id="XX'.$record->get('e.cod').'XX"href="psa_manageVociIndicatore.php?cod='.$record->get('e.cod').'"> info</a>');
+            '<a id="XX'.$record->get('e.cod').'XX"href="psa_manageVociIndicatore.php?cod='.$record->get('e.cod').'"> info</a>');
+
+            $percComplAtt = $record->get('e.percComplAtt');
+            $node[] = array('v' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
+                            'f' => "<progress value=" . $percComplAtt . "></progress>" . " " . $percComplAtt * 100);
+            $percComplFin = $record->get('e.percComplFin');                            
+            $node[] = array('v' => $record->get('e.codAlf').' - '.preg_replace('@\x{FFFD}@u', 'à', $record->get('e.nome')),
+                            'f' => "<progress value=" . $percComplFin . "></progress>" . " " . $percComplFin * 100);
             $rows[] = array('c' => $node);
         }
-
         break;
     // Livello TARGET
     case 'TA':

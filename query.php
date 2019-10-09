@@ -51,11 +51,9 @@ a.nome, a.codAlf,
 b.nome, b.codAlf,
 c.nome, c.codAlf,
 d.nome, d.codAlf,
-e.nome, e.codAlf, e.cod
+e.nome, e.codAlf, e.cod, e.percComplAtt, e.percComplFin
 ORDER BY e.cod
 ');
-
-
 
 // Voci Indicatore
 $vi_query =('

@@ -1,5 +1,9 @@
 <?php
 
+/*
+    Questa funzione aggiorna un singolo indicatore. Deve essere chiamata dopo
+    inserimento/rimozione di una nuova voce dell'indicatore nel form apposito
+*/
 function evaluate_perc_in($client, $indicatore, $data, $final)
 {
     // Query data indicatore
@@ -203,6 +207,16 @@ function evaluate_perc_in($client, $indicatore, $data, $final)
         }
     }
 
-    return $perc_compl > 1 ? 1 : $perc_compl;
-    // Calcolare percentuale completamento
+    $perc_compl = $perc_compl > 1 ? 1: $perc_compl;
+    
+    $insert = '
+        MATCH (a:ps_voci {tipo:"AS"})<-[:PS_VOCI]-(b:ps_voci {tipo:"MO"})<-[:PS_VOCI]-(c:ps_voci {tipo:"AZ"})<-[:PS_VOCI]-(d:ps_voci {tipo:"TA"})<-[:PS_VOCI]-(f {cod: %d})
+        SET %s = %.2f
+        RETURN %s
+    ';
+    $field = $final == 0 ? "f.percComplAtt" : "f.percComplFin";
+    $insert = sprintf($insert, $indicatore, $field, $perc_compl, $field);
+    $client->run($insert);
+
+    return $perc_compl;
 }
