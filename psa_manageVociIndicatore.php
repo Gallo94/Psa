@@ -112,32 +112,35 @@ $jsonTableTrend = json_encode($table);
 		</div>
 		<!-- Table -->
 		<table id="listaVociIdentificatore" class="table">
-			<tr>
-				<th>Data Att.</th><th>Valore Att.</th><th>Data Fin.</th><th>Valore Fin.</th><th>Nota</th>
+			<tr id="header_table_in">
+				<th>Data Attuale</th><th>Valore Atteso</th><th>Data Finale</th><th>Valore Raggiunto</th><th>Nota</th>
 			</tr>
 			<?php foreach($result->records() as $r) { ?>
 				<tr class="active" id="idindicatore">
-					<td width="10%">
+					<td>
 						<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
 						value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
 					</td>
 					<td width="10%">
-						<input type="number" class="form-control datepicker" id="valoreVoce"
+						<input type="number" class="form-control datepicker" id="valoreVoceAtt"
 						value=<?php echo $r->get('ValoreAtteso') ?>>
 					</td>
+					<td>
+						<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
+						value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
+					</td>
 					<td width="10%">
-						<select class="form-control">
-							<option value="A">Atteso</option>
-							<option value="R">Raggiunto</option>
-						</select>
+						<input type="number" class="form-control datepicker" id="valoreVoceRagg"
+						value=<?php echo $r->get('ValoreRaggiunto') ?>>
 					</td>
-					<td width="64%">
-						<input type="input" class="form-control" id="notaVoce">
+					<td width="30%">
+						<input type="input" class="form-control" id="notaVoce"
+						value="<?php echo $r->get('Nota')?>">
 					</td>
-					<td width="3%">
+					<td>
 						<button class="btn btn-success" data-toggle="confirmation" id="buttonUpdate"><i class="fas fa-check"></i></button>
 					</td>
-					<td width="3%"><button class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button></td>
+					<td><button class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button></td>
 				</tr>
 
 			<?php } ?>
