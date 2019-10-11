@@ -12,10 +12,16 @@ if(isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Update'))
     $valore_rag = $_POST["ValoreRaggiunto"];
     $natura = $_POST["Natura"];
     $nota = $_POST["Nota"];
+    $final = $data == "2023-12-31" ? 1 : 0;
+
 
     $query = $update_query;
     $query = sprintf($query, $cod, $id, $data, $valore_att, $valore_rag, $natura, $nota);
     $result = $client->run($query);
+
+    // Update db
+    aggiorna_indicatore($client, $cod);
+    evaluate_perc_in($client, $cod, $data, $final);
 }
 else if (isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Insert'))
 {
@@ -30,28 +36,33 @@ else if (isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Insert'))
     $valoreRag = $_POST["ValoreRaggiunto"];
     $natura = $_POST["Natura"];
     $nota = $_POST["Nota"];
+    $final = $data == "2023-12-31" ? 1 : 0;
 
     $query = $insert_query;
     $query = sprintf($query, $id, $data, $natura, $nota, $valoreAtt, $valoreRag, $cod);
     $result = $client->run($query);
+
+    // Update db
+    aggiorna_indicatore($client, $cod);
+    evaluate_perc_in($client, $cod, $data, $final);
 }
 else if (isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Delete'))
 {
     echo "Delete"; 
 
     $id = $_POST["Id"];
-    // $cod = $_POST["Cod"];
-    // $data = $_POST["Data"];
-    // $final = $data == "2023-12-31" ? 1 : 0;
+    $cod = $_POST["Cod"];
+    $data = $_POST["Data"];
+    $final = $data == "2023-12-31" ? 1 : 0;
 
     // Delete row
     $query = $delete_query;
     $query = sprintf($query, $id);
     $result = $client->run($query);
 
-    // // Update db
-    // aggiorna_indicatore($client, $cod);
-    // evaluate_perc_in($client, $cod, $data, $final);
+    // Update db
+    aggiorna_indicatore($client, $cod);
+    evaluate_perc_in($client, $cod, $data, $final);
 }
 
 ?>

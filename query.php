@@ -66,7 +66,7 @@ f.valoreAtteso as ValoreAtteso,
 f.valoreRaggiunto as ValoreRaggiunto,
 f.natura as Natura,
 f.nota as Nota
-ORDER BY Data
+ORDER BY Data DESC
 ');
 
 // Rimuovo un nodo dello storico dell' indicatore
@@ -91,6 +91,6 @@ f.valoreAtteso as ValoreAtteso,
 f.valoreRaggiunto as ValoreRaggiunto,
 f.natura as Natura,
 f.nota as Nota
-ORDER BY Data
+ORDER BY Data DESC
 ')
 ?>
