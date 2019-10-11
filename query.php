@@ -59,6 +59,7 @@ ORDER BY e.cod
 $vi_query =('
 MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f)
 RETURN
+e.cod as Cod,
 f.id as Id,
 f.data as Data,
 f.valoreAtteso as ValoreAtteso,

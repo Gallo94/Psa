@@ -23,18 +23,12 @@ foreach ($result->records() as $r)
 	if ($r->get('Nota') == null) {
 		$temp[] = null;
 		$temp[] = null;
-	} else {
-		// $temp[] = array('v' => (string) $r->get('Natura')); 
-		// $temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
-	}
+	} else {}
 	$temp[] = array('v' => (float) $r->get('ValoreRaggiunto')); 
 	if ($r->get('Nota') == null) {
 		$temp[] = null;
 		$temp[] = null;
-	} else {
-		// $temp[] = array('v' => (string) $r->get('Natura')); 
-		// $temp[] = array('v' => (string) utf8_encode($r->get('Nota'))); 
-	}
+	} else {}
 	
 	// aggiunge la riga creata al vettore delle righe 
 	$rows[] = array('c' => $temp);
@@ -45,11 +39,7 @@ $table['cols'] = array(
 		// label individua le colonne della tabella la prima è l'etichetta e la seconda il valore (type:xxxx) 
 		array('label' => 'Data', 'type' => 'date'),						// Data
 		array('label' => 'Atteso', 'type' => 'number'),					// Valore Atteso 
-		// array('label' => 'TitoloAtteso', 'type' => 'string'),			// Titolo Valore  Atteso
-		// array('label' => 'TestoAtteso', 'type' => 'string'),			// Testo Nota Valore Atteso
 		array('label' => 'Raggiunto', 'type' => 'number'),				// Valore Aggiunto
-		// array('label' => 'TitoloRaggiunto', 'type' => 'string'),		// Titolo Nota Valore Raggiunto
-		// array('label' => 'TestoRaggiunto', 'type' => 'string'),			// Nota Valore Aggiunto 
 );
 
 $table['rows'] = $rows;
@@ -110,45 +100,58 @@ $jsonTableTrend = json_encode($table);
 		<div class="container-fluid">
 			<div id='chart_div' style='width: 800px; height: 400px; margin-top: 10px'/>
 		</div>
-		<!-- Table -->
-		<table id="listaVociIdentificatore" class="table">
-			<tr id="header_table_in">
-			<th>#</th><th>Data Attuale</th><th>Valore Atteso</th><th>Valore Raggiunto</th><th>Natura</th><th>Nota</th>
-			</tr>
-			<?php foreach($result->records() as $r) { ?>
-				<tr class="active" id="idindicatore">
-					<td>
-						<input type="number" class="form-control datepicker"  value="<?php echo $r->get("Id"); ?>">
-					</td>
-					<td>
-						<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
-						value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
-					</td>
-					<td width="10%">
-						<input type="number" class="form-control datepicker" id="valoreVoce"
-						value=<?php echo $r->get("ValoreAtteso"); ?>>
-					</td>
-					<td width="10%">
-						<input type="number" class="form-control datepicker" id="valoreVoce1"
-						value=<?php echo $r->get("ValoreRaggiunto"); ?>>
-					</td>
-					<td>
-						<select class="form-control"  value="<?php echo $r->get("Natura"); ?>">
-							<option value = 'A'> Atteso</option>
-							<option value = 'R'> Raggiunto</option>
-						</select>
-					</td>
-					<td width="30%">
-						<input type="input" class="form-control" id="notaVoce"
-						value="<?php echo $r->get('Nota')?>">
-					</td>
-					<td>
-						<button class="btn btn-success" data-toggle="confirmation" id="buttonUpdate"><i class="fas fa-check"></i></button>
-					</td>
-					<td><button class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button></td>
-				</tr>
-
-			<?php } ?>
-		</table>
+		<!-- Card  -->
+		<div class="card" style="margin-top: 10px;">
+			<h3 class="card-header font-weight-bold text-uppercase py-3">Indicatore n° <?php echo $r->get("Cod"); ?></h3>
+				<div id="table">
+					<!-- Table -->
+				<div class="table-responsive text-nowrap">
+					<!-- Table -->
+					<table class="table table-responsive-md text-center" id="listaVociIdentificatore">
+						<!-- Header table  -->
+						<thead>
+							<tr>
+								<th>Data</th>
+								<th>Valore Atteso</th>
+								<th>Valore Raggiunto</th>
+								<th>Natura</th>
+								<th>Nota</th>
+								<th>Azioni</th>
+							</tr>
+						</thead>
+						<?php foreach($result->records() as $r) { ?>
+							<tr class="active" id="idindicatore">
+								<td>
+									<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
+									value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
+								</td>
+								<td width="10%">
+									<input type="number" class="form-control datepicker" id="valoreAtt"
+									value=<?php echo $r->get("ValoreAtteso"); ?>>
+								</td>
+								<td width="10%">
+									<input type="number" class="form-control datepicker" id="valoreRag"
+									value=<?php echo $r->get("ValoreRaggiunto"); ?>>
+								</td>
+								<td>
+									<select class="form-control" value="<?php echo $r->get("Natura"); ?>">
+										<option value = "A"> Atteso</option>
+										<option value = "R"> Raggiunto</option>
+									</select>
+								</td>
+								<td width="30%">
+									<input type="input" class="form-control" id="notaVoce"
+									value="<?php echo $r->get('Nota')?>">
+								</td>
+								<td>
+									<button type="button" class="btn btn-success" data-toggle="confirmation" id="buttonUpdate"><i class="fas fa-check"></i></button>
+									<button type="button" class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button>
+								</td>
+							</tr>
+						<?php } ?>
+					</table>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
