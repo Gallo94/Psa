@@ -15,28 +15,28 @@ if(isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Update'))
     $natura = $_POST["Natura"];
     $nota = $_POST["Nota"];
 
-    $query = $insert_query;
-    $query = sprintf($query, $cod, $data, $valore_att, $valore_rag, $natura, $nota);
+    $query = $update_query;
+    $query = sprintf($query, $cod, $id, $data, $valore_att, $valore_rag, $natura, $nota);
     $result = $client->run($query);
 }
 else if (isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Insert'))
 {
-    echo "Insert";
+    // echo "Insert";
 
-    $id = $_POST["ID"];
-    $cod = $_POST["Cod"];
-    $data = $_POST["Data"];
-    $valore = $_POST["Valore"];
-    $natura = $_POST["Natura"];
-    $nota = $_POST["Nota"];
+    // $id = $_POST["ID"];
+    // $cod = $_POST["Cod"];
+    // $data = $_POST["Data"];
+    // $valore = $_POST["Valore"];
+    // $natura = $_POST["Natura"];
+    // $nota = $_POST["Nota"];
 
-        $query = $insert_query;
-    if ($natura == 'A')
-        $query = sprintf($query, $cod, $data, $valore, null, $natura, $nota);
-    else
-        $query = sprintf($query, $cod, $data, null, $valore, $natura, $nota);
+    //     $query = $insert_query;
+    // if ($natura == 'A')
+    //     $query = sprintf($query, $cod, $data, $valore, null, $natura, $nota);
+    // else
+    //     $query = sprintf($query, $cod, $data, null, $valore, $natura, $nota);
 
-    $result = $client->run($query);
+    // $result = $client->run($query);
 }
 else if (isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Delete'))
 {

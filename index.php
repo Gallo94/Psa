@@ -15,7 +15,6 @@ switch ($dlevel) {
         $rows = array();
         foreach ($result->records() as $record)
         {
-           
             // $va = ev_valori_attesi($client, $record->get('e.cod'), "2019-01-01");
             // $vr = ev_valori_raggiunti($client, $record->get("e.cod"), "2019-01-01");
             // printf("%d: [%d, %d]<br>", $record->get("e.cod"), $va, $vr);

@@ -120,32 +120,31 @@ $jsonTableTrend = json_encode($table);
 							</tr>
 						</thead>
 						<?php foreach($result->records() as $r) { ?>
-							<tr class="active" id="idindicatore">
+							<tr class="active" id="idindicatore<?php echo $r->get("Id"); ?>">
 								<td>
-									<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
+									<input type="date" class="form-control datepicker" id="dataVoce<?php echo $r->get("Id");?>" data-date-format="yyyy/mm/dd"
 									value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
 								</td>
 								<td width="10%">
-									<input type="number" class="form-control datepicker" id="valoreAtt"
+									<input type="number" class="form-control datepicker" id="valoreAtt<?php echo $r->get("Id");?>"
 									value=<?php echo $r->get("ValoreAtteso"); ?>>
 								</td>
 								<td width="10%">
-									<input type="number" class="form-control datepicker" id="valoreRag"
+									<input type="number" class="form-control datepicker" id="valoreRag<?php echo $r->get("Id");?>"
 									value=<?php echo $r->get("ValoreRaggiunto"); ?>>
 								</td>
 								<td>
-									<select class="form-control">
+									<select class="form-control" id="select<?php echo $r->get("Id");?>">
 										<option value="A" <?php echo $r->get("Natura") == "A" ? "selected" : ""?>> Atteso</option>
 										<option value="R" <?php echo $r->get("Natura") == "R" ? "selected" : ""?>> Raggiunto</option>
 									</select>
 								</td>
 								<td width="30%">
-									<input type="input" class="form-control" id="notaVoce"
-									value="<?php echo $r->get('Nota')?>">
+									<input type="input" class="form-control" id="notaVoce<?php echo $r->get("Id");?>" value="<?php echo $r->get('Nota')?>">
 								</td>
 								<td>
-									<button type="button" class="btn btn-success" data-toggle="confirmation" id="buttonUpdate"><i class="fas fa-check"></i></button>
-									<button type="button" class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button>
+									<button type="button" class="btn btn-success" data-toggle="confirmation" id="buttonUpdate" accesskey="<?php echo $r->get("Id");?>"><i class="fas fa-check"></i></button>
+									<button type="button" class="btn btn-danger" id="buttonDelete<?php echo $r->get("Id");?>"><i class="fas fa-trash"></i></button>
 								</td>
 							</tr>
 						<?php } ?>
@@ -153,5 +152,34 @@ $jsonTableTrend = json_encode($table);
 				</div>
 			</div>
 		</div>
+		<script>
+			$(document).ready(function()
+			{
+				var wrapper = $("#listaVociIdentificatore");
+				// update voce indicatore
+				$(wrapper).on("click","#buttonUpdate", function(e)
+				{
+					e.preventDefault();
+					var id = $(this).attr('accesskey');
+					var cod = <?php echo $codindicatore?>;
+					var dataVoce = $('#dataVoce'+id).val();
+					var valoreAtt = $('#valoreAtt'+id).val();
+					var valoreRag = $('#valoreRag'+id).val();
+					var naturaVoce = $('#select'+id).val();
+					var notaVoce = $('#notaVoce'+id).val();
+					var operazioneVoce = 'Update';
+
+					$.ajax(
+					{
+						url: "psa_crudVoceIndicatore.php",
+						type: "post",
+						data: {ID: id, Cod: cod, Data: dataVoce, ValoreAtteso: valoreAtt, ValoreRaggiunto: valoreRag, Natura: naturaVoce,Nota: notaVoce,Operazione: operazioneVoce},
+						success:function (php_script_response) {
+							$(document).ajaxStop(function() { location.reload(true); });
+						}
+					});
+				});
+			});
+		</script>
 	</body>
 </html>
