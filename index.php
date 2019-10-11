@@ -15,11 +15,11 @@ switch ($dlevel) {
         $rows = array();
         foreach ($result->records() as $record)
         {
-            
+           
             // $va = ev_valori_attesi($client, $record->get('e.cod'), "2019-01-01");
             // $vr = ev_valori_raggiunti($client, $record->get("e.cod"), "2019-01-01");
             // printf("%d: [%d, %d]<br>", $record->get("e.cod"), $va, $vr);
-            // aggiorna_indicatore($client, $record->get("e.cod"), "2019-01-01"); 
+            // aggiorna_indicatore($client, $record->get("e.cod"), "2019-08-28"); 
             // $perc_att = evaluate_perc_in($client, $record->get('e.cod'), "2019-08-28", 0);
             // $perc_att = number_format($perc_att, 2, '.', ',');
             // $perc_fin = evaluate_perc_in($client, $record->get('e.cod'), "2023-12-31", 1);

@@ -41,18 +41,22 @@ function ev_valori_attesi($client, $cod, $data)
     else if ($data == $data_iniziale_indicatore || $data == $data_finale_indicatore)
     {
         $query ='
-            MATCH p=(e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico) WHERE date(f.data) = date("%s") AND f.natura = "A"
+            MATCH p=(e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico)
+            WHERE date(f.data) = date("%s") AND f.natura = "A"
             RETURN f.valoreAtteso as ValoreAtteso
         ';
         $query = sprintf($query, $cod, $data);
         $result = $client->run($query);
         $record = $result->getRecord();
+
+        $valore_atteso = $record->get("ValoreAtteso");
     }
     else if ($data > $data_iniziale_indicatore || $data < $data_finale_indicatore)
     {
         $valore_atteso = null;
         $query ='
-            MATCH p=(e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico) WHERE date(f.data) = date("%s") AND f.natura = "A"
+            MATCH p=(e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico)
+            WHERE date(f.data) = date("%s") AND f.natura = "A"
             RETURN f.valoreAtteso as ValoreAtteso
         ';
         $query = sprintf($query, $cod, $data);
@@ -119,13 +123,15 @@ function ev_valori_raggiunti($client, $cod, $data)
     }
 
     $query = '
-        MATCH (a:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(b:ps_storico {natura:"R"})
+        MATCH (a:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(b:ps_storico {natura: "R"})
         RETURN date(min(b.data)) as data_iniziale_indicatore, date(max(b.data)) as data_finale_indicatore,
         max(b.valoreRaggiunto) as valoreRaggiuntoFinale
     ';
     $query = sprintf($query, $cod);
     $result = $client->run($query);
     $record = $result->getRecord();
+    if ($record == null)
+        return 0;
 
     $data_iniziale_indicatore = $record->get("data_iniziale_indicatore");
     $data_finale_indicatore = $record->get("data_finale_indicatore");
@@ -166,16 +172,14 @@ function ev_valori_raggiunti($client, $cod, $data)
         $valore_raggiunto_superiore = $record->get("valore_raggiunto_superiore");
 
         $data1 = new DateTime($data);
-        $valore_raggiunto =  ($data1->diff($data_inferiore)->days / $data_superiore->diff($data_inferiore)->days) * ($valore_raggiunto_superiore - $valore_raggiunto_inferiore) + $valore_raggiunto_inferiore;
+        $valore_raggiunto = (float)($data1->diff($data_inferiore)->days / $data_superiore->diff($data_inferiore)->days) * (float)($valore_raggiunto_superiore - $valore_raggiunto_inferiore) + $valore_raggiunto_inferiore;
     }
-
-    if ($data > $data_finale_indicatore)
+    else if ($data > $data_finale_indicatore)
     {
         $valore_raggiunto = $valoreRaggiuntoFinale;
     }
     else if ($data >= $data_iniziale_indicatore && $data <= $data_finale_indicatore)
     {
-        $valore_raggiunto = null;
         $query = '
             MATCH (a:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(b:ps_storico {natura:"R"})
             WHERE date(b.data) = date("%s") 
@@ -184,8 +188,6 @@ function ev_valori_raggiunti($client, $cod, $data)
         $query = sprintf($query, $cod, $data);
         $result = $client->run($query);
         $record = $result->getRecord();
-
-        // $valore_raggiunto = $record->get("valore_raggiunto");
         if ($record == null)
         {
             $query = '
@@ -210,7 +212,8 @@ function ev_valori_raggiunti($client, $cod, $data)
             $record = $result->getRecord();
 
             $valore_raggiunto_superiore = $record->get("valore_raggiunto_superiore");
-            $data_superiore =  new DateTime($record->get("data_superiore"));
+            $tmp = $record->get("data_superiore");
+            $data_superiore =  new DateTime($tmp);
 
             $data1 = new DateTime($data);
             $valore_raggiunto =  ($data1->diff($data_inferiore)->days / $data_superiore->diff($data_inferiore)->days) * ($valore_raggiunto_superiore - $valore_raggiunto_inferiore) + $valore_raggiunto_inferiore;    
@@ -229,6 +232,7 @@ function aggiorna_indicatore($client, $cod)
     $query =('
         MATCH p=(e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f)
         RETURN
+        f.id as Id,
         f.valoreAtteso as ValoreAtteso,
         f.valoreRaggiunto as ValoreRaggiunto,
         f.natura as Natura,
@@ -242,49 +246,34 @@ function aggiorna_indicatore($client, $cod)
     
     foreach ($result->getRecords() as $record)
     {
-        // $valore_atteso = $record->get("ValoreAtteso");
-        // $valore_raggiunto = $record->get("ValoreRaggiunto");
-        $natura = $record->get("Natura");
-        $data = $record->get("Data");
-        // $nota = $record->get("Nota");
+        $valore_atteso    = $record->get("ValoreAtteso");
+        $valore_raggiunto = $record->get("ValoreRaggiunto");
+        $natura           = $record->get("Natura");
+        $data             = $record->get("Data");
 
-        $value = 0;
-        // if ($natura == 'A' && $valore_raggiunto == null && $nota == "Starting Point")
-        // {  
-        //     $query = 'MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura: "A"})
-        //     WHERE f.nota = "Starting Point"
-        //     SET f.valoreRaggiunto = 0.0
-        //     RETURN f.valoreRaggiunto as ValoreRaggiunto';
-        //     $query = sprintf($query, $cod);
-        //     $result = $client->run($query);
-        //     $record = $result->getRecord();
-        // }
-        if ($natura == 'A')
+        if ($natura == 'A' && $valore_raggiunto == null)
         {
-            $value = ev_valori_raggiunti($client, $cod, $data);
+            $valore_raggiunto = ev_valori_raggiunti($client, $cod, $data);
             $query = '
                 MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
                 WHERE date(f.data) = date("%s")
                 SET f.valoreRaggiunto = %.2f
-                RETURN f.valoreRaggiunto as valoreRaggiunto
+                RETURN f.valoreRaggiunto
             ';
-
-            $query = sprintf($query, $cod, $data, $value);
+            $query = sprintf($query, $cod, $data, $valore_raggiunto);
             $result = $client->run($query);
-            // $record = $result->getRecord();
         }
-        else if ($natura == 'R')
+        else if ($natura == 'R' && $valore_atteso == null)
         {
-            $value = ev_valori_attesi($client, $cod, $data);
+            $valore_atteso = ev_valori_attesi($client, $cod, $data);
             $query = '
                 MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"R"})
                 WHERE date(f.data) = date("%s")
-                SET f.valoreAtteso = %.2f
-                RETURN f.valoreAtteso as valoreAtteso
+                SET f.valoreAttesso = %.2f
+                RETURN f.valoreAtteso
             ';
-            $query = sprintf($query, $cod, $data, (float)$value);
+            $query = sprintf($query, $cod, $data, $valore_atteso);
             $result = $client->run($query);
-            // $record = $result->getRecord();
         }
     }
 }

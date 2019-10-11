@@ -113,10 +113,13 @@ $jsonTableTrend = json_encode($table);
 		<!-- Table -->
 		<table id="listaVociIdentificatore" class="table">
 			<tr id="header_table_in">
-				<th>Data Attuale</th><th>Valore Atteso</th><th>Data Finale</th><th>Valore Raggiunto</th><th>Nota</th>
+			<th>#</th><th>Data Attuale</th><th>Valore Atteso</th><th>Valore Raggiunto</th><th>Nota</th>
 			</tr>
 			<?php foreach($result->records() as $r) { ?>
 				<tr class="active" id="idindicatore">
+					<td>
+						<input type="number" class="form-control datepicker"  value="<?php echo $r->get("Id"); ?>">
+					</td>
 					<td>
 						<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
 						value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
@@ -124,10 +127,6 @@ $jsonTableTrend = json_encode($table);
 					<td width="10%">
 						<input type="number" class="form-control datepicker" id="valoreVoceAtt"
 						value=<?php echo $r->get('ValoreAtteso') ?>>
-					</td>
-					<td>
-						<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
-						value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
 					</td>
 					<td width="10%">
 						<input type="number" class="form-control datepicker" id="valoreVoceRagg"
