@@ -64,3 +64,18 @@ b, strong
 {
     background-color: #81b1dd !important;
 }
+
+/* Design Form Voci Indicatore */
+#text
+{
+    vertical-align: middle !important;
+}
+#listaVociIdentificatore td
+{
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+#dataVoce, #valoreAtt, #valoreRag, #natura
+{
+    text-align: center !important;
+}

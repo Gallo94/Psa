@@ -96,58 +96,82 @@ $jsonTableTrend = json_encode($table);
 				<img src="/LogoUnicam.png" height="30" class="d-inline-block align-top" style="margin-right: 20px"> Gestione Voci Indicatore
 			</a>
 		</nav>
-		<!-- Chart  -->
 		<div class="container-fluid">
+			<!-- Chart  -->
 			<div id='chart_div' style='width: 800px; height: 400px; margin-top: 10px'/>
 		</div>
 		<!-- Card  -->
 		<div class="card" style="margin-top: 10px;">
-			<h3 class="card-header font-weight-bold text-uppercase py-3">Indicatore n° <?php echo $r->get("Cod"); ?></h3>
+			<h3 class="card-header font-weight-bold text-uppercase py-3">Indicatore n° <?php echo $r->get("Cod");?></h3>
 				<div id="table">
 					<!-- Table -->
 				<div class="table-responsive text-nowrap">
-					<!-- Table -->
 					<table class="table table-responsive-md text-center" id="listaVociIdentificatore">
 						<!-- Header table  -->
 						<thead>
 							<tr>
-								<th>Data</th>
-								<th>Valore Atteso</th>
-								<th>Valore Raggiunto</th>
-								<th>Natura</th>
-								<th>Nota</th>
-								<th>Azioni</th>
+								<th scope="col">Data</th>
+								<th scope="col">Valore Atteso</th>
+								<th scope="col">Valore Raggiunto</th>
+								<th scope="col">Natura</th>
+								<th scope="col">Nota</th>
+								<th scope="col">Azioni</th>
 							</tr>
 						</thead>
 						<?php foreach($result->records() as $r) { ?>
-							<tr class="active" id="idindicatore<?php echo $r->get("Id"); ?>">
-								<td>
-									<input type="date" class="form-control datepicker" id="dataVoce<?php echo $r->get("Id");?>" data-date-format="yyyy/mm/dd"
+							<tr class="active" id="idindicatore">
+								<td scope="row">
+									<input type="date" class="form-control datepicker" id="dataVoce" data-date-format="yyyy/mm/dd"
 									value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
 								</td>
-								<td width="10%">
-									<input type="number" class="form-control datepicker" id="valoreAtt<?php echo $r->get("Id");?>"
+								<td scope="row" width="10%">
+									<input type="number" class="form-control datepicker" id="valoreAtt"
 									value=<?php echo $r->get("ValoreAtteso"); ?>>
 								</td>
-								<td width="10%">
-									<input type="number" class="form-control datepicker" id="valoreRag<?php echo $r->get("Id");?>"
+								<td scope="row" width="10%">
+									<input type="number" class="form-control datepicker" id="valoreRag"
 									value=<?php echo $r->get("ValoreRaggiunto"); ?>>
 								</td>
-								<td>
-									<select class="form-control" id="select<?php echo $r->get("Id");?>">
-										<option value="A" <?php echo $r->get("Natura") == "A" ? "selected" : ""?>> Atteso</option>
-										<option value="R" <?php echo $r->get("Natura") == "R" ? "selected" : ""?>> Raggiunto</option>
+								<td scope="row" width="10%">
+									<select class="form-control" value="<?php echo $r->get("Natura"); ?>" id="natura">
+										<option value = "A"> Atteso</option>
+										<option value = "R"> Raggiunto</option>
 									</select>
 								</td>
-								<td width="30%">
-									<input type="input" class="form-control" id="notaVoce<?php echo $r->get("Id");?>" value="<?php echo $r->get('Nota')?>">
+								<td scope="row" width="35%">
+									<input type="input" class="form-control" id="notaVoce"
+									value="<?php echo $r->get('Nota')?>">
 								</td>
-								<td>
-									<button type="button" class="btn btn-success" data-toggle="confirmation" id="buttonUpdate" accesskey="<?php echo $r->get("Id");?>"><i class="fas fa-check"></i></button>
-									<button type="button" class="btn btn-danger" id="buttonDelete<?php echo $r->get("Id");?>"><i class="fas fa-trash"></i></button>
+								<td scope="row">
+									<button type="button" class="btn btn-primary" id="buttonUpdate"><i class="fas fa-check"></i></button>
+									<button type="button" class="btn btn-danger" id="buttonDelete"><i class="fas fa-trash"></i></button>
 								</td>
 							</tr>
 						<?php } ?>
+						<tr id="nuovaVoce">
+							<td scope="row">
+									<input type="date" class="form-control datepicker" id="dataVoceInsert" data-date-format="yyyy/mm/dd" min="2018-01-01" max="2023-12-31">
+								</td>
+								<td scope="row" width="10%">
+									<input type="number" class="form-control datepicker" id="valoreAttInsert">
+								</td>
+								<td scope="row" width="10%">
+									<input type="number" class="form-control datepicker" id="valoreRagInsert">
+								</td>
+								<td scope="row" width="10%">
+									<select class="form-control" id="naturaInsert">
+										<option value = "A"> Atteso</option>
+										<option value = "R"> Raggiunto</option>
+									</select>
+								</td>
+								<td scope="row" width="35%">
+									<input type="input" class="form-control" placeholder="Inserisci una nota" id="notaVoceInsert">
+								</td>
+								<td scope="row">
+									<button type="button" class="btn btn-success float-right" id="buttonInsert" style="right: 60px;"><i class="fas fa-plus"></i></button>
+								</td>
+							</td>
+						</tr>
 					</table>
 				</div>
 			</div>
