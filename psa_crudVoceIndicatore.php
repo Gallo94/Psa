@@ -5,9 +5,7 @@ require_once 'evaluate_perc.php';
 
 if(isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Update'))
 {
-    echo "Update";
-
-    $id = $_POST["ID"];
+    $id = $_POST["Id"];
     $cod = $_POST["Cod"];
     $data = $_POST["Data"];
     $valore_att = $_POST["ValoreAtteso"];
@@ -21,36 +19,35 @@ if(isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Update'))
 }
 else if (isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Insert'))
 {
-    // echo "Insert";
+    $last_id_query = 'MATCH (e:ps_voci)<-[:PS_STORICO_VOCI]-(f:ps_storico) RETURN max(f.id) as Id';
+    $result = $client->run($last_id_query);
+    $max_id = $result->getRecord()->get("Id");
 
-    // $id = $_POST["ID"];
-    // $cod = $_POST["Cod"];
-    // $data = $_POST["Data"];
-    // $valore = $_POST["Valore"];
-    // $natura = $_POST["Natura"];
-    // $nota = $_POST["Nota"];
+    $id = $max_id + 1;
+    $cod = $_POST["Cod"];
+    $data = $_POST["Data"];
+    $valoreAtt = $_POST["ValoreAtteso"];
+    $valoreRag = $_POST["ValoreRaggiunto"];
+    $natura = $_POST["Natura"];
+    $nota = $_POST["Nota"];
 
-    //     $query = $insert_query;
-    // if ($natura == 'A')
-    //     $query = sprintf($query, $cod, $data, $valore, null, $natura, $nota);
-    // else
-    //     $query = sprintf($query, $cod, $data, null, $valore, $natura, $nota);
-
-    // $result = $client->run($query);
+    $query = $insert_query;
+    $query = sprintf($query, $id, $data, $natura, $nota, $valoreAtt, $valoreRag, $cod);
+    $result = $client->run($query);
 }
 else if (isset($_POST['Operazione']) && ($_POST['Operazione'] == 'Delete'))
 {
-    // echo "Delete"; 
+    echo "Delete"; 
 
-    // $id = $_POST["ID"];
+    $id = $_POST["Id"];
     // $cod = $_POST["Cod"];
     // $data = $_POST["Data"];
     // $final = $data == "2023-12-31" ? 1 : 0;
 
-    // // Delete row
-    // $query = $delete_query;
-    // $query = sprintf($query, $id);
-    // $result = $client->run($query);
+    // Delete row
+    $query = $delete_query;
+    $query = sprintf($query, $id);
+    $result = $client->run($query);
 
     // // Update db
     // aggiorna_indicatore($client, $cod);
