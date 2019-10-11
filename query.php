@@ -74,9 +74,9 @@ MATCH (e:ps_voci)<-[:PS_STORICO_VOCI]-(f:ps_storico {id: %d})
 DETACH DELETE f
 ');
 // Aggiorno lo storico dell' indicatore
-$update_query = ('
+$insert_query = ('
 MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f)
-SET f.data="%s", f.valoreAtteso="%.2f", f.valoreRaggiunto="%.2f", f.natura="%s", f.nota="%s" 
+SET f.data="%s", f.valoreAtteso=%.2f, f.valoreRaggiunto=%.2f, f.natura="%s", f.nota="%s" 
 RETURN
 f.data as Data,
 f.valoreAtteso as ValoreAtteso,

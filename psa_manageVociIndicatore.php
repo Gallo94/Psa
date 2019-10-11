@@ -113,7 +113,7 @@ $jsonTableTrend = json_encode($table);
 		<!-- Table -->
 		<table id="listaVociIdentificatore" class="table">
 			<tr id="header_table_in">
-			<th>#</th><th>Data Attuale</th><th>Valore Atteso</th><th>Valore Raggiunto</th><th>Nota</th>
+			<th>#</th><th>Data Attuale</th><th>Valore Atteso</th><th>Valore Raggiunto</th><th>Natura</th><th>Nota</th>
 			</tr>
 			<?php foreach($result->records() as $r) { ?>
 				<tr class="active" id="idindicatore">
@@ -125,12 +125,18 @@ $jsonTableTrend = json_encode($table);
 						value="<?php echo $r->get('Data') ?>" min="2018-01-01" max="2023-12-31">
 					</td>
 					<td width="10%">
-						<input type="number" class="form-control datepicker" id="valoreVoceAtt"
-						value=<?php echo $r->get('ValoreAtteso') ?>>
+						<input type="number" class="form-control datepicker" id="valoreVoce"
+						value=<?php echo $r->get("ValoreAtteso"); ?>>
 					</td>
 					<td width="10%">
-						<input type="number" class="form-control datepicker" id="valoreVoceRagg"
-						value=<?php echo $r->get('ValoreRaggiunto') ?>>
+						<input type="number" class="form-control datepicker" id="valoreVoce1"
+						value=<?php echo $r->get("ValoreRaggiunto"); ?>>
+					</td>
+					<td>
+						<select class="form-control"  value="<?php echo $r->get("Natura"); ?>">
+							<option value = 'A'> Atteso</option>
+							<option value = 'R'> Raggiunto</option>
+						</select>
 					</td>
 					<td width="30%">
 						<input type="input" class="form-control" id="notaVoce"

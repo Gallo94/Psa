@@ -253,7 +253,7 @@ function aggiorna_indicatore($client, $cod)
 
         if ($natura == 'A' && $valore_raggiunto == null)
         {
-            $valore_raggiunto = ev_valori_raggiunti($client, $cod, $data);
+            $valore_raggiunto = $valore_raggiunto != null ? $valore_raggiunto : ev_valori_raggiunti($client, $cod, $data);
             $query = '
                 MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"A"})
                 WHERE date(f.data) = date("%s")
@@ -265,7 +265,7 @@ function aggiorna_indicatore($client, $cod)
         }
         else if ($natura == 'R' && $valore_atteso == null)
         {
-            $valore_atteso = ev_valori_attesi($client, $cod, $data);
+            $valore_atteso = $valore_atteso != null ? $valore_atteso : ev_valori_attesi($client, $cod, $data);
             $query = '
                 MATCH (e:ps_voci {cod: %d})<-[:PS_STORICO_VOCI]-(f:ps_storico {natura:"R"})
                 WHERE date(f.data) = date("%s")
