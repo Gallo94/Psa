@@ -134,9 +134,9 @@ $jsonTableTrend = json_encode($table);
 									value=<?php echo $r->get("ValoreRaggiunto"); ?>>
 								</td>
 								<td>
-									<select class="form-control" value="<?php echo $r->get("Natura"); ?>">
-										<option value = "A"> Atteso</option>
-										<option value = "R"> Raggiunto</option>
+									<select class="form-control">
+										<option value="A" <?php echo $r->get("Natura") == "A" ? "selected" : ""?>> Atteso</option>
+										<option value="R" <?php echo $r->get("Natura") == "R" ? "selected" : ""?>> Raggiunto</option>
 									</select>
 								</td>
 								<td width="30%">
